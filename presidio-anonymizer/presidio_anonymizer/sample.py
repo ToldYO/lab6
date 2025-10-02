@@ -1,32 +1,43 @@
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import RecognizerResult, OperatorConfig
 
-def sample_run_anonymizer():
+def sample_run_anonymizer(text: str, start: int, end: int):
+    """
+    Run the Presidio anonymizer with provided parameters.
+
+    Args:
+        text (str): The input text.
+        start (int): Start index of the entity.
+        end (int): End index of the entity.
+
+    Returns:
+        AnonymizerResult: The anonymized result object.
+    """
     # Initialize the engine
     engine = AnonymizerEngine()
 
-    # Invoke the anonymize function with the text, 
-    # analyzer results (potentially coming from presidio-analyzer) and
-    # Operators to get the anonymization output:
+    # Invoke the anonymize function
     result = engine.anonymize(
-        text=input("text: "),
-        analyzer_results=[RecognizerResult(entity_type="PERSON", start=int(input("start: ")), end=int(input("end: ")), score=0.8)],
+        text=text,
+        analyzer_results=[
+            RecognizerResult(
+                entity_type="PERSON",
+                start=start,
+                end=end,
+                score=0.8
+            )
+        ],
         operators={"PERSON": OperatorConfig("replace", {"new_value": "BIP"})}
     )
 
+    return result
+
+
+if __name__ == "__main__":
+    # Keep CLI interactivity only here
+    user_text = input("text: ")
+    user_start = int(input("start: "))
+    user_end = int(input("end: "))
+
+    result = sample_run_anonymizer(user_text, user_start, user_end)
     print(result)
-
-    # input should be:
-    # text: My name is Bond.
-    # start: 11
-    # end: 15
-    # 
-    # output should be:
-    # text: My name is BIP.
-    # items:
-    # [
-    #     {'start': 11, 'end': 14, 'entity_type': 'PERSON', 'text': 'BIP', 'operator': 'replace'}
-    # ]
-
-if __name__ == "__main__": 
-    sample_run_anonymizer();
